@@ -1,14 +1,19 @@
 package com.module.imagehandler;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -105,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         btt.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
                 new GetSource().execute();
                 try {
                     Thread.sleep(1000);
@@ -112,8 +118,23 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                TextView tv = (TextView)findViewById(R.id.textView);
-                tv.setText(getUrl(str));
+                getUrl(str);
+                final WebView web = (WebView) findViewById(R.id.webView);
+                web.getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+                web.getSettings().setSupportMultipleWindows(false);
+                web.getSettings().setSavePassword(false);
+                web.getSettings().setBuiltInZoomControls(true);
+                web.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+                web.getSettings().setUseWideViewPort(true);
+                web.getSettings().setLoadWithOverviewMode(true);
+                String url = str;
+                String x = "<html><head><meta name=\"viewport\" content=\"width=device-width\"/><style type=\"text/css\">html, body {margin: 0;padding: 0;} img {border: none;}</style><head><body style=\"background: black;\"><table><tr><td align=\"center\"><img src=\"" + url + "\" /></td></tr></table></body></html>";
+                web.loadDataWithBaseURL(null, x, "text/html", "utf-8", null);
+                //WebView wv = (WebView)findViewById(R.id.webView);
+
+
+                //wv.setInitialScale(100);
+                //wv.loadUrl(str);
             }
         });
 
@@ -140,18 +161,26 @@ public class MainActivity extends AppCompatActivity {
         // are available.
         delayedHide(100);
     }
+
+
+    //WYCIAGANIE URL ZDJECIA Z URL===========================================================
     private String getUrl(String src){
         String url="";
         int pos = str.indexOf("self");
         String subStr = str.substring(pos);
         str = subStr;
         pos =  str.indexOf("img src");
-        subStr = str.substring(pos+9);
+        subStr = str.substring(pos + 9);
         str = subStr;
         pos = str.indexOf("alt");
         subStr = str.substring(0,pos-3);
+        str = subStr;
         return subStr;
     }
+
+
+
+    //POBIERANIE ZRUDLA STRONY======================================================================
     private class GetSource extends AsyncTask<String,Integer,String> {
 
         @Override
