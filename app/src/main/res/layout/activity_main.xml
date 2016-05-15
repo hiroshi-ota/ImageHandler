@@ -45,6 +45,22 @@
                 android:text="@string/dummy_button" />
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="435dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView"
+            android:layout_gravity="left|top" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button1"
+            android:layout_gravity="center_horizontal|bottom" />
     </FrameLayout>
 
 </FrameLayout>

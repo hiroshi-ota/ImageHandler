@@ -1,12 +1,21 @@
 package com.module.imagehandler;
 
 import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -29,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
+    public String str = "";
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
@@ -88,11 +98,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
-
+        Button btt = (Button) findViewById(R.id.button1);
+        btt.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                new GetSource().execute();
+                try {
+                    Thread.sleep(1000);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                TextView tv = (TextView)findViewById(R.id.textView);
+                tv.setText(getUrl(str));
+            }
+        });
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -117,6 +140,65 @@ public class MainActivity extends AppCompatActivity {
         // are available.
         delayedHide(100);
     }
+    private String getUrl(String src){
+        String url="";
+        int pos = str.indexOf("self");
+        String subStr = str.substring(pos);
+        str = subStr;
+        pos =  str.indexOf("img src");
+        subStr = str.substring(pos+9);
+        str = subStr;
+        pos = str.indexOf("alt");
+        subStr = str.substring(0,pos-3);
+        return subStr;
+    }
+    private class GetSource extends AsyncTask<String,Integer,String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            URLConnection conn = null;
+            try {
+                conn = (new URL("http://kwejk.pl/losuj").openConnection());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            try {
+                conn.connect();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            InputStream in = null;
+            try {
+                in = conn.getInputStream();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            BufferedReader rd = new BufferedReader(new InputStreamReader(in));
+            StringBuilder src = new StringBuilder();
+            try{
+                for (String line; (line = rd.readLine()) != null;){
+                    src.append(line);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            try{
+                in.close();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            str = src.toString();
+            return null;
+        }
+    }
+
 
     private void toggle() {
         if (mVisible) {
